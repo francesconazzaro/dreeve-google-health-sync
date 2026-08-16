@@ -1,0 +1,19 @@
+# Add this service to the same docker-compose.yml as your Dreeve stack
+# (https://dreeve.app), alongside the `app` and `daemon` services. It shares
+# Dreeve's `./watch` folder so files it writes are picked up automatically by
+# Dreeve's own file-import cron -- no extra wiring needed on Dreeve's side.
+
+services:
+  google-health-sync:
+    build: https://github.com/YOUR_USERNAME/dreeve-google-health-sync.git
+    # or, once published: image: ghcr.io/YOUR_USERNAME/dreeve-google-health-sync:latest
+    container_name: dreeve-google-health-sync
+    restart: unless-stopped
+    environment:
+      GHEALTH_CLIENT_ID: ${GHEALTH_CLIENT_ID}
+      GHEALTH_CLIENT_SECRET: ${GHEALTH_CLIENT_SECRET}
+      LOOKBACK_DAYS: ${LOOKBACK_DAYS:-30}
+      SYNC_INTERVAL_SECONDS: ${SYNC_INTERVAL_SECONDS:-3600}
+    volumes:
+      - ./watch:/watch                 # same folder Dreeve's daemon watches
+      - ./google-health-token:/data    # persists token.json + export state
