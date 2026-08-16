@@ -5,8 +5,7 @@
 
 services:
   google-health-sync:
-    build: https://github.com/YOUR_USERNAME/dreeve-google-health-sync.git
-    # or, once published: image: ghcr.io/YOUR_USERNAME/dreeve-google-health-sync:latest
+    build: https://github.com/francesconazzaro/dreeve-google-health-sync.git
     container_name: dreeve-google-health-sync
     restart: unless-stopped
     environment:
