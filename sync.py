@@ -15,6 +15,7 @@ avoid re-exporting the same activity, and writing into the shared volume.
 Configuration is entirely via environment variables -- see README.md.
 """
 import json
+import logging
 import os
 import re
 import subprocess
@@ -37,6 +38,12 @@ TO_DATE = os.environ.get("TO_DATE")
 
 MAX_QUERY_DAYS = 90  # API limit for the "exercise" data type
 TOKEN_URL = "https://oauth2.googleapis.com/token"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 STATE_FILE = TOKEN_DIR / "exported_ids.json"
 TOKEN_FILE = TOKEN_DIR / "token.json"
@@ -135,7 +142,7 @@ def list_exercises_range(start, end):
     window_start = start
     while window_start < end:
         window_end = min(window_start + timedelta(days=MAX_QUERY_DAYS), end)
-        print(f"querying {window_start.date()} .. {window_end.date()}", file=sys.stderr)
+        logging.info(f"querying {window_start.date()} .. {window_end.date()}")
         points.extend(list_exercises_window(window_start, window_end))
         window_start = window_end
     return points
@@ -187,7 +194,7 @@ def main():
         try:
             tcx = export_tcx(point_id)
         except RuntimeError as e:
-            print(f"skip {point_id}: {e}", file=sys.stderr)
+            logging.warning(f"skip {point_id}: {e}")
             continue
 
         if "<Trackpoint>" not in tcx:
@@ -202,9 +209,9 @@ def main():
         processed.add(point_id)
         save_state(processed)
         new_count += 1
-        print(f"exported {filename}")
+        logging.info(f"exported {filename}")
 
-    print(f"done: {new_count} new TCX file(s) written")
+    logging.info(f"done: {new_count} new TCX file(s) written")
 
 
 if __name__ == "__main__":
