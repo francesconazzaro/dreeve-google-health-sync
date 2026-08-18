@@ -125,9 +125,12 @@ docker compose run --rm -e FROM_DATE=2025-03-01 -e TO_DATE=2025-07-01 google-hea
 - Exported activity IDs are tracked in `TOKEN_DIR/exported_ids.json` so
   re-running never creates duplicates; Dreeve's own importer also dedupes
   independently by activity start time as a second safety net.
-- If Google ever expires your refresh token (can happen for unverified
-  Testing-mode apps after long inactivity), redo step 2 and replace
-  `token.json`.
+- **Your refresh token will expire every 7 days.** Google enforces a 7-day
+  refresh token lifetime for apps in "Testing" publishing status *when the
+  app requests sensitive or restricted scopes* -- and `activity_and_fitness`
+  / `location` are both classified as Restricted. (Thanks to a Dreeve
+  Discord member for flagging this -- confirmed, not theoretical.) When it
+  expires, redo step 2 and replace `token.json`.
 
 ## License
 
